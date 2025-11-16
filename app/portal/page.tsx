@@ -1,0 +1,16 @@
+import { BooksGrid } from "@/components/portal/books-grid"
+import { BookSearch } from "@/components/portal/book-search"
+
+export default function PortalPage() {
+  return (
+    <div className="container mx-auto max-w-7xl">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Explorar Livros</h1>
+        <p className="text-muted-foreground">Descubra e reserve livros da nossa coleção</p>
+      </div>
+
+      <BookSearch />
+      <BooksGrid />
+    </div>
+  )
+}
