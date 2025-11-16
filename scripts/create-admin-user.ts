@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs"
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017"
 const MONGODB_DB = process.env.MONGODB_DB || "library"
 
-async function createAdminUser() {
+async function createLibrarianUser() {
   const client = new MongoClient(MONGODB_URI)
 
   try {
@@ -14,35 +14,35 @@ async function createAdminUser() {
     const db = client.db(MONGODB_DB)
     const usersCollection = db.collection("users")
 
-    // Check if admin already exists
-    const existingAdmin = await usersCollection.findOne({ email: "admin@library.com" })
+    // Check if librarian already exists
+    const existingLibrarian = await usersCollection.findOne({ email: "librarian@library.com" })
 
-    if (existingAdmin) {
-      console.log("Admin user already exists")
+    if (existingLibrarian) {
+      console.log("Librarian user already exists")
       return
     }
 
-    // Create admin user
-    const hashedPassword = await bcrypt.hash("admin123", 10)
+    // Create librarian user (acts as administrator)
+    const hashedPassword = await bcrypt.hash("librarian123", 10)
     const now = new Date()
 
     await usersCollection.insertOne({
-      name: "Admin User",
-      email: "admin@library.com",
+      name: "Librarian User",
+      email: "librarian@library.com",
       password: hashedPassword,
-      role: "ADMIN",
+      role: "LIBRARIAN",
       createdAt: now,
       updatedAt: now,
     })
 
-    console.log("Admin user created successfully")
-    console.log("Email: admin@library.com")
-    console.log("Password: admin123")
+    console.log("Librarian user created successfully")
+    console.log("Email: librarian@library.com")
+    console.log("Password: librarian123")
   } catch (error) {
-    console.error("Error creating admin user:", error)
+    console.error("Error creating librarian user:", error)
   } finally {
     await client.close()
   }
 }
 
-createAdminUser()
+createLibrarianUser()

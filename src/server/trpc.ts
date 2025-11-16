@@ -24,25 +24,11 @@ const isAuthenticated = t.middleware(({ ctx, next }) => {
   })
 })
 
-const isAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" })
-  }
-  if (ctx.session.user.role !== "ADMIN") {
-    throw new TRPCError({ code: "FORBIDDEN" })
-  }
-  return next({
-    ctx: {
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  })
-})
-
 const isLibrarian = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" })
   }
-  if (ctx.session.user.role !== "LIBRARIAN" && ctx.session.user.role !== "ADMIN") {
+  if (ctx.session.user.role !== "LIBRARIAN") {
     throw new TRPCError({ code: "FORBIDDEN" })
   }
   return next({
@@ -58,8 +44,7 @@ const isMember = t.middleware(({ ctx, next }) => {
   }
   if (
     ctx.session.user.role !== "MEMBER" &&
-    ctx.session.user.role !== "LIBRARIAN" &&
-    ctx.session.user.role !== "ADMIN"
+    ctx.session.user.role !== "LIBRARIAN"
   ) {
     throw new TRPCError({ code: "FORBIDDEN" })
   }
@@ -71,6 +56,5 @@ const isMember = t.middleware(({ ctx, next }) => {
 })
 
 export const protectedProcedure = t.procedure.use(isAuthenticated)
-export const adminProcedure = t.procedure.use(isAdmin)
 export const librarianProcedure = t.procedure.use(isLibrarian)
 export const memberProcedure = t.procedure.use(isMember)

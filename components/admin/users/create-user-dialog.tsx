@@ -23,7 +23,7 @@ interface CreateUserForm {
   name: string
   email: string
   password: string
-  role: "ADMIN" | "LIBRARIAN" | "MEMBER"
+  role: "LIBRARIAN" | "MEMBER"
   phone?: string
   address?: string
 }
@@ -109,7 +109,6 @@ export function CreateUserDialog() {
               <SelectContent>
                 <SelectItem value="MEMBER">Membro</SelectItem>
                 <SelectItem value="LIBRARIAN">Bibliotecário</SelectItem>
-                <SelectItem value="ADMIN">Administrador</SelectItem>
               </SelectContent>
             </Select>
           </div>

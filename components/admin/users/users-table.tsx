@@ -1,14 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { trpc } from "@/lib/trpc"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { SearchIcon, TrashIcon } from "lucide-react"
-import { Spinner } from "@/components/ui/spinner"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SearchIcon, TrashIcon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,65 +25,68 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 export function UsersTable() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [deleteUserId, setDeleteUserId] = useState<string | null>(null)
-  const { toast } = useToast()
-  const utils = trpc.useUtils()
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const { toast } = useToast();
+  const utils = trpc.useUtils();
 
-  const { data: users, isLoading } = trpc.user.getAll.useQuery()
+  const { data: users, isLoading } = trpc.user.getAll.useQuery();
 
   const deleteUser = trpc.user.delete.useMutation({
     onSuccess: () => {
       toast({
         title: "Sucesso",
         description: "Usuário excluído com sucesso",
-      })
-      utils.user.getAll.invalidate()
-      setDeleteUserId(null)
+      });
+      utils.user.getAll.invalidate();
+      setDeleteUserId(null);
     },
     onError: (error) => {
       toast({
         title: "Erro",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   const filteredUsers = users?.filter(
     (user) =>
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getRoleBadge = (role: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
       ADMIN: "destructive",
       LIBRARIAN: "default",
       MEMBER: "secondary",
-    }
+    };
     const labels: Record<string, string> = {
-      ADMIN: "Administrador",
       LIBRARIAN: "Bibliotecário",
       MEMBER: "Membro",
-    }
-    return <Badge variant={variants[role] || "default"}>{labels[role] || role}</Badge>
-  }
+    };
+    return (
+      <Badge variant={variants[role] || "default"}>
+        {labels[role] || role}
+      </Badge>
+    );
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Spinner className="size-8" />
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -88,7 +98,7 @@ export function UsersTable() {
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -108,7 +118,11 @@ export function UsersTable() {
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
                   <TableCell>{user.phone || "-"}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon-sm" onClick={() => setDeleteUserId(user.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => setDeleteUserId(user.id)}
+                    >
                       <TrashIcon className="size-4 text-destructive" />
                     </Button>
                   </TableCell>
@@ -117,7 +131,9 @@ export function UsersTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
-                  {searchQuery ? "Nenhum usuário encontrado para sua busca." : "Nenhum usuário disponível."}
+                  {searchQuery
+                    ? "Nenhum usuário encontrado para sua busca."
+                    : "Nenhum usuário disponível."}
                 </TableCell>
               </TableRow>
             )}
@@ -125,18 +141,24 @@ export function UsersTable() {
         </Table>
       </div>
 
-      <AlertDialog open={!!deleteUserId} onOpenChange={() => setDeleteUserId(null)}>
+      <AlertDialog
+        open={!!deleteUserId}
+        onOpenChange={() => setDeleteUserId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              Isso excluirá permanentemente este usuário. Essa ação não pode ser desfeita.
+              Isso excluirá permanentemente este usuário. Essa ação não pode ser
+              desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => deleteUserId && deleteUser.mutate({ id: deleteUserId })}
+              onClick={() =>
+                deleteUserId && deleteUser.mutate({ id: deleteUserId })
+              }
               className="bg-destructive text-white hover:bg-destructive/90"
             >
               {deleteUser.isPending ? "Excluindo..." : "Excluir"}
@@ -145,5 +167,5 @@ export function UsersTable() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }

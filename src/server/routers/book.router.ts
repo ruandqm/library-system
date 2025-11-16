@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { router, publicProcedure, adminProcedure } from "../trpc"
+import { router, publicProcedure, librarianProcedure } from "../trpc"
 import { MongoDBBookRepository } from "@/infrastructure/repositories/mongodb-book.repository"
 import { CreateBookUseCase } from "@/application/use-cases/book/create-book.use-case"
 import { GetBooksUseCase } from "@/application/use-cases/book/get-books.use-case"
@@ -20,7 +20,7 @@ export const bookRouter = router({
     return await useCase.execute(input.query)
   }),
 
-  create: adminProcedure
+  create: librarianProcedure
     .input(
       z.object({
         title: z.string().min(1),
@@ -39,7 +39,7 @@ export const bookRouter = router({
       return await useCase.execute(input)
     }),
 
-  update: adminProcedure
+  update: librarianProcedure
     .input(
       z.object({
         id: z.string(),
@@ -60,7 +60,7 @@ export const bookRouter = router({
       return await useCase.execute(id, data)
     }),
 
-  delete: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+  delete: librarianProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
     const useCase = new DeleteBookUseCase(bookRepository)
     await useCase.execute(input.id)
   }),

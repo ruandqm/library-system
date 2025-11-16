@@ -9,7 +9,7 @@ export default async function HomePage() {
   }
 
   // Redirect based on role
-  if (session.user.role === "ADMIN" || session.user.role === "LIBRARIAN") {
+  if (session.user.role === "LIBRARIAN") {
     redirect("/admin")
   } else {
     redirect("/portal")

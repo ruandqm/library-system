@@ -1,11 +1,11 @@
 import { z } from "zod"
-import { router, adminProcedure, protectedProcedure } from "../trpc"
+import { router, librarianProcedure, protectedProcedure } from "../trpc"
 import { MongoDBUserRepository } from "@/infrastructure/repositories/mongodb-user.repository"
 
 const userRepository = new MongoDBUserRepository()
 
 export const userRouter = router({
-  getAll: adminProcedure.query(async () => {
+  getAll: librarianProcedure.query(async () => {
     return await userRepository.findAll()
   }),
 
@@ -19,13 +19,13 @@ export const userRouter = router({
     return userWithoutPassword
   }),
 
-  create: adminProcedure
+  create: librarianProcedure
     .input(
       z.object({
         name: z.string().min(1),
         email: z.string().email(),
         password: z.string().min(6),
-        role: z.enum(["ADMIN", "LIBRARIAN", "MEMBER"]),
+        role: z.enum(["LIBRARIAN", "MEMBER"]),
         phone: z.string().optional(),
         address: z.string().optional(),
       }),
@@ -46,7 +46,7 @@ export const userRouter = router({
       return await userRepository.update(ctx.session.user.id, input)
     }),
 
-  delete: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+  delete: librarianProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
     await userRepository.delete(input.id)
   }),
 })

@@ -1,7 +1,25 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpenIcon, UsersIcon, BookMarkedIcon, CalendarIcon } from "lucide-react"
+import { MongoDBBookRepository } from "@/infrastructure/repositories/mongodb-book.repository"
+import { MongoDBLoanRepository } from "@/infrastructure/repositories/mongodb-loan.repository"
+import { MongoDBUserRepository } from "@/infrastructure/repositories/mongodb-user.repository"
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  const bookRepository = new MongoDBBookRepository()
+  const loanRepository = new MongoDBLoanRepository()
+  const userRepository = new MongoDBUserRepository()
+
+  const [books, loans, users] = await Promise.all([
+    bookRepository.findAll(),
+    loanRepository.findAll(),
+    userRepository.findAll(),
+  ])
+
+  const totalBooks = books.length
+  const availableBooks = books.filter((book) => book.availableCopies > 0).length
+  const activeLoans = loans.filter((loan) => loan.status === "ACTIVE").length
+  const totalMembers = users.filter((user) => user.role === "MEMBER").length
+
   return (
     <div className="container mx-auto max-w-7xl">
       <div className="mb-6">
@@ -18,7 +36,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">{totalBooks}</p>
             <CardDescription>Livros na biblioteca</CardDescription>
           </CardContent>
         </Card>
@@ -31,7 +49,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">{availableBooks}</p>
             <CardDescription>Prontos para empréstimo</CardDescription>
           </CardContent>
         </Card>
@@ -44,7 +62,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">{activeLoans}</p>
             <CardDescription>Atualmente emprestados</CardDescription>
           </CardContent>
         </Card>
@@ -57,7 +75,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">{totalMembers}</p>
             <CardDescription>Usuários registrados</CardDescription>
           </CardContent>
         </Card>

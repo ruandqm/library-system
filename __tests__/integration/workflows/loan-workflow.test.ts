@@ -13,7 +13,7 @@ describe("Loan Workflow Integration Tests", () => {
   let loanRepository: MongoDBLoanRepository
   let createLoanUseCase: CreateLoanUseCase
   let returnLoanUseCase: ReturnLoanUseCase
-  const testDbName = "library-test"
+  const testDbName = "library-test-loan-workflow"
 
   beforeAll(async () => {
     const uri = process.env.MONGODB_URI || "mongodb://localhost:27017"

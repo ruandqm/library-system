@@ -1,14 +1,13 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest"
 import { MongoDBBookRepository } from "@/infrastructure/repositories/mongodb-book.repository"
 import { MongoClient, type Db } from "mongodb"
 import type { CreateBookInput } from "@/domain/entities/book.entity"
-import { vi } from "vitest-mock"
 
 describe("MongoDBBookRepository Integration Tests", () => {
   let client: MongoClient
   let db: Db
   let repository: MongoDBBookRepository
-  const testDbName = "library-test"
+  const testDbName = "library-test-books"
 
   beforeAll(async () => {
     const uri = process.env.MONGODB_URI || "mongodb://localhost:27017"

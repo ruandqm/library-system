@@ -8,7 +8,7 @@ describe("MongoDBLoanRepository Integration Tests", () => {
   let client: MongoClient
   let db: Db
   let repository: MongoDBLoanRepository
-  const testDbName = "library-test"
+  const testDbName = "library-test-loans"
 
   beforeAll(async () => {
     const uri = process.env.MONGODB_URI || "mongodb://localhost:27017"
