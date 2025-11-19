@@ -1,83 +1,22 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
 import { MongoDBBookRepository } from "@/infrastructure/repositories/mongodb-book.repository"
-import { MongoClient, type Db } from "mongodb"
 import type { CreateBookInput } from "@/domain/entities/book.entity"
+import { connect, close, clear } from "../../helpers/db-test-setup"
 
 describe("MongoDBBookRepository Integration Tests", () => {
-  let client: MongoClient
-  let db: Db
   let repository: MongoDBBookRepository
-  const testDbName = "library-test-books"
 
   beforeAll(async () => {
-    const uri = process.env.MONGODB_URI || "mongodb://localhost:27017"
-    
-    // Retry connection logic
-    let retries = 5
-    let lastError: Error | null = null
-    
-    while (retries > 0) {
-      try {
-        // Create a new client for each attempt
-        client = new MongoClient(uri, {
-          serverSelectionTimeoutMS: 10000,
-          connectTimeoutMS: 10000,
-        })
-        
-        await client.connect()
-        db = client.db(testDbName)
-
-        // Mock getDatabase to return test database
-        const originalGetDatabase = await import("@/infrastructure/database/mongodb")
-        vi.spyOn(originalGetDatabase, "getDatabase").mockResolvedValue(db)
-
-        repository = new MongoDBBookRepository()
-        return // Success, exit retry loop
-      } catch (error) {
-        lastError = error as Error
-        // Close client if it was created
-        if (client) {
-          try {
-            await client.close()
-          } catch {
-            // Ignore close errors
-          }
-          client = null as any
-        }
-        retries--
-        if (retries > 0) {
-          console.log(`Connection attempt failed, retrying... (${5 - retries}/5)`)
-          await new Promise((resolve) => setTimeout(resolve, 2000)) // Wait 2 seconds before retry
-        }
-      }
-    }
-    
-    // If we get here, all retries failed
-    console.error("Failed to connect to MongoDB after 5 attempts:", lastError)
-    throw lastError || new Error("Failed to connect to MongoDB")
-  }, 60000) // 60 second timeout
+    await connect()
+    repository = new MongoDBBookRepository()
+  })
 
   afterAll(async () => {
-    if (db) {
-      try {
-        await db.dropDatabase()
-      } catch (error) {
-        console.error("Failed to drop database:", error)
-      }
-    }
-    if (client) {
-      try {
-        await client.close()
-      } catch (error) {
-        console.error("Failed to close client:", error)
-      }
-    }
-  }, 60000) // 60 second timeout
+    await close()
+  })
 
   beforeEach(async () => {
-    if (db) {
-      await db.collection("books").deleteMany({})
-    }
+    await clear()
   })
 
   it("should create a book and retrieve it", async () => {
