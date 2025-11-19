@@ -18,26 +18,46 @@ describe("Loan Workflow Integration Tests", () => {
   beforeAll(async () => {
     const uri = process.env.MONGODB_URI || "mongodb://localhost:27017"
     client = new MongoClient(uri)
-    await client.connect()
-    db = client.db(testDbName)
+    
+    try {
+      await client.connect()
+      db = client.db(testDbName)
 
-    const originalGetDatabase = await import("@/infrastructure/database/mongodb")
-    vi.spyOn(originalGetDatabase, "getDatabase").mockResolvedValue(db)
+      const originalGetDatabase = await import("@/infrastructure/database/mongodb")
+      vi.spyOn(originalGetDatabase, "getDatabase").mockResolvedValue(db)
 
-    bookRepository = new MongoDBBookRepository()
-    loanRepository = new MongoDBLoanRepository()
-    createLoanUseCase = new CreateLoanUseCase(loanRepository, bookRepository)
-    returnLoanUseCase = new ReturnLoanUseCase(loanRepository, bookRepository)
-  })
+      bookRepository = new MongoDBBookRepository()
+      loanRepository = new MongoDBLoanRepository()
+      createLoanUseCase = new CreateLoanUseCase(loanRepository, bookRepository)
+      returnLoanUseCase = new ReturnLoanUseCase(loanRepository, bookRepository)
+    } catch (error) {
+      console.error("Failed to connect to MongoDB:", error)
+      throw error
+    }
+  }, 30000) // 30 second timeout
 
   afterAll(async () => {
-    await db.dropDatabase()
-    await client.close()
-  })
+    if (db) {
+      try {
+        await db.dropDatabase()
+      } catch (error) {
+        console.error("Failed to drop database:", error)
+      }
+    }
+    if (client) {
+      try {
+        await client.close()
+      } catch (error) {
+        console.error("Failed to close client:", error)
+      }
+    }
+  }, 30000) // 30 second timeout
 
   beforeEach(async () => {
-    await db.collection("books").deleteMany({})
-    await db.collection("loans").deleteMany({})
+    if (db) {
+      await db.collection("books").deleteMany({})
+      await db.collection("loans").deleteMany({})
+    }
   })
 
   it("should complete full loan lifecycle: create loan, check availability, return loan", async () => {
