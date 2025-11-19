@@ -18,7 +18,7 @@ A full-stack library management system built with Next.js, tRPC, MongoDB, and Ne
 - **Database**: MongoDB
 - **Authentication**: NextAuth v5
 - **Styling**: TailwindCSS v4
-- **Testing**: Vitest (unit/integration) + Playwright (E2E)
+- **Testing**: Vitest (unit/integration)
 - **Architecture**: Clean Architecture pattern
 
 ## Getting Started
@@ -94,12 +94,6 @@ npm run test
 npm run test -- **tests**/integration
 \`\`\`
 
-### E2E Tests
-
-\`\`\`bash
-npm run test:e2e
-\`\`\`
-
 ### Test Coverage
 
 \`\`\`bash
@@ -125,8 +119,7 @@ npm run test:coverage
 │ └── ui/ # Shared UI components
 ├── **tests**/ # Test files
 │ ├── use-cases/ # Unit tests
-│ ├── integration/ # Integration tests
-│ └── e2e/ # E2E tests
+│ └── integration/ # Integration tests
 └── scripts/ # Database scripts
 \`\`\`
 
