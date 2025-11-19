@@ -66,5 +66,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Wait for MongoDB to be ready
+        run: |
+          n=0
+          until [ $n -ge 30 ]; do
+            if command -v mongosh &> /dev/null; then
+              if mongosh --host localhost:27017 --eval "db.adminCommand({ping: 1})" --quiet 2>/dev/null; then
+                echo "MongoDB is ready!"
+                exit 0
+              fi
+            else
+              # Fallback: try to connect using Node.js
+              if node -e "const { MongoClient } = require('mongodb'); (async () => { const client = new MongoClient('mongodb://localhost:27017', { serverSelectionTimeoutMS: 2000 }); try { await client.connect(); await client.close(); process.exit(0); } catch { process.exit(1); } })()" 2>/dev/null; then
+                echo "MongoDB is ready!"
+                exit 0
+              fi
+            fi
+            echo "Waiting for MongoDB... ($n/30)"
+            sleep 2
+            n=$((n+1))
+          done
+          echo "MongoDB did not become ready in time"
+          exit 1
+
       - name: Run integration tests
         run: npm run test:integration -- --run

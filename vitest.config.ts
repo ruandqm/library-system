@@ -9,7 +9,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/tests/setup.ts"],
     exclude: [...defaultExclude],
-    hookTimeout: 30000, // 30 seconds for hooks
+    hookTimeout: 60000, // 60 seconds for hooks
     testTimeout: 10000, // 10 seconds for individual tests
     coverage: {
       provider: "v8",

@@ -11,22 +11,51 @@ describe("MongoDBBookRepository Integration Tests", () => {
 
   beforeAll(async () => {
     const uri = process.env.MONGODB_URI || "mongodb://localhost:27017"
-    client = new MongoClient(uri)
     
-    try {
-      await client.connect()
-      db = client.db(testDbName)
+    // Retry connection logic
+    let retries = 5
+    let lastError: Error | null = null
+    
+    while (retries > 0) {
+      try {
+        // Create a new client for each attempt
+        client = new MongoClient(uri, {
+          serverSelectionTimeoutMS: 10000,
+          connectTimeoutMS: 10000,
+        })
+        
+        await client.connect()
+        db = client.db(testDbName)
 
-      // Mock getDatabase to return test database
-      const originalGetDatabase = await import("@/infrastructure/database/mongodb")
-      vi.spyOn(originalGetDatabase, "getDatabase").mockResolvedValue(db)
+        // Mock getDatabase to return test database
+        const originalGetDatabase = await import("@/infrastructure/database/mongodb")
+        vi.spyOn(originalGetDatabase, "getDatabase").mockResolvedValue(db)
 
-      repository = new MongoDBBookRepository()
-    } catch (error) {
-      console.error("Failed to connect to MongoDB:", error)
-      throw error
+        repository = new MongoDBBookRepository()
+        return // Success, exit retry loop
+      } catch (error) {
+        lastError = error as Error
+        // Close client if it was created
+        if (client) {
+          try {
+            await client.close()
+          } catch {
+            // Ignore close errors
+          }
+          client = null as any
+        }
+        retries--
+        if (retries > 0) {
+          console.log(`Connection attempt failed, retrying... (${5 - retries}/5)`)
+          await new Promise((resolve) => setTimeout(resolve, 2000)) // Wait 2 seconds before retry
+        }
+      }
     }
-  }, 30000) // 30 second timeout
+    
+    // If we get here, all retries failed
+    console.error("Failed to connect to MongoDB after 5 attempts:", lastError)
+    throw lastError || new Error("Failed to connect to MongoDB")
+  }, 60000) // 60 second timeout
 
   afterAll(async () => {
     if (db) {
@@ -43,7 +72,7 @@ describe("MongoDBBookRepository Integration Tests", () => {
         console.error("Failed to close client:", error)
       }
     }
-  }, 30000) // 30 second timeout
+  }, 60000) // 60 second timeout
 
   beforeEach(async () => {
     if (db) {
