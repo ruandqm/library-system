@@ -13,30 +13,24 @@ export async function connectToDatabase(): Promise<Db> {
   }
 
   const uri = process.env.MONGODB_URI
-  const isAtlas = uri.includes("mongodb.net") || uri.includes("atlas")
-  const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL
+  const isVercel = !!process.env.VERCEL
 
   // Configure MongoDB client options
+  // MongoDB Atlas handles TLS/SSL automatically via the connection string
+  // Don't override TLS settings as it can cause conflicts
   const options: MongoClientOptions = {
-    // Enable TLS/SSL for Atlas or production environments
-    ...(isAtlas || isProduction
-      ? {
-          tls: true,
-          // MongoDB Atlas uses valid certificates, so don't allow invalid ones in production
-          tlsAllowInvalidCertificates: false,
-        }
-      : {}),
-    // Connection pool options for serverless environments
-    maxPoolSize: isProduction ? 1 : 10, // Serverless works better with smaller pools
-    minPoolSize: isProduction ? 0 : 1,
-    // Server selection timeout
-    serverSelectionTimeoutMS: 10000,
-    // Socket timeout
-    socketTimeoutMS: 45000,
-    // Connection timeout
-    connectTimeoutMS: 10000,
-    // Retry writes for better reliability
+    // Connection pool options optimized for serverless (Vercel)
+    maxPoolSize: isVercel ? 1 : 10, // Vercel works best with pool size 1
+    minPoolSize: isVercel ? 0 : 1, // Allow connections to close in serverless
+    // Timeouts optimized for serverless environments
+    serverSelectionTimeoutMS: isVercel ? 20000 : 10000,
+    socketTimeoutMS: isVercel ? 60000 : 45000,
+    connectTimeoutMS: isVercel ? 20000 : 10000,
+    // Retry configuration for reliability
     retryWrites: true,
+    retryReads: true,
+    // Compression for better performance
+    compressors: isVercel ? [] : ["zlib"], // Skip compression on Vercel to reduce CPU usage
   }
 
   client = new MongoClient(uri, options)
