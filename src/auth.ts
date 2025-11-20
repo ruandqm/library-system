@@ -16,14 +16,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("E-mail e senha são obrigatórios")
+          return null
         }
 
         try {
           const user = await userRepository.findByEmail(credentials.email as string)
 
           if (!user) {
-            throw new Error("E-mail ou senha inválidos")
+            return null
           }
 
           const isPasswordValid = await bcrypt.compare(
@@ -32,7 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           )
 
           if (!isPasswordValid) {
-            throw new Error("E-mail ou senha inválidos")
+            return null
           }
 
           return {
@@ -42,45 +42,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             role: user.role,
           }
         } catch (error) {
-          // Handle database connection errors
+          // Only log actual errors (database connection, etc)
+          console.error("Authentication error:", error)
+
+          // If it's a database connection error, we might want to throw it
+          // so the user knows it's a system error, not bad credentials.
           if (error instanceof Error) {
-            const errorMessage = error.message.toLowerCase()
-
-            // Check if it's a MongoDB connection error
-            if (
-              errorMessage.includes("mongoserverselectionerror") ||
-              errorMessage.includes("mongonetworkerror") ||
-              errorMessage.includes("ssl") ||
-              errorMessage.includes("tls") ||
-              errorMessage.includes("connection") ||
-              errorMessage.includes("timeout") ||
-              errorMessage.includes("connect")
-            ) {
-              console.error("Database connection error:", error)
-              throw new Error(
-                "Erro ao conectar com o banco de dados. Por favor, tente novamente mais tarde ou entre em contato com o suporte."
-              )
+            const msg = error.message.toLowerCase()
+            if (msg.includes("mongo") || msg.includes("connect") || msg.includes("timeout")) {
+              throw new Error("Erro de conexão com o banco de dados")
             }
-
-            // Check if it's a database query error
-            if (
-              errorMessage.includes("mongodb_uri") ||
-              errorMessage.includes("environment variable")
-            ) {
-              console.error("Configuration error:", error)
-              throw new Error(
-                "Erro de configuração do servidor. Por favor, entre em contato com o suporte."
-              )
-            }
-
-            // Re-throw other errors with their original message
-            console.error("Authentication error:", error)
-            throw error
           }
 
-          // Unknown error
-          console.error("Unknown authentication error:", error)
-          throw new Error("Erro ao processar login. Por favor, tente novamente.")
+          // For other errors, return null to indicate auth failure (generic)
+          return null
         }
       },
     }),
@@ -101,12 +76,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session
     },
   },
-  events: {
-    async signIn() {
-      // Success event - can be used for logging
-    },
-  },
-  debug: process.env.NODE_ENV === "development",
   pages: {
     signIn: "/auth/signin",
   },
