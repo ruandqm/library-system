@@ -105,7 +105,7 @@ export function AdminNav({ user }: AdminNavProps) {
       </header>
 
       {/* Bottom navigation - mobile only */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/75 md:hidden">
         <div className="flex h-14 items-center justify-around px-4">
           {navItems.map((item) => {
             const Icon = item.icon

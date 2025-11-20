@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Spinner } from "@/components/ui/spinner"
 import { Separator } from "@/components/ui/separator"
+import { formatPhone } from "@/lib/utils"
 
 interface ProfileFormData {
   name: string
@@ -95,7 +96,17 @@ export function AdminProfileForm() {
 
         <div className="space-y-2">
           <Label htmlFor="phone">Phone Number</Label>
-          <Input id="phone" type="tel" {...register("phone")} placeholder="+1 (555) 000-0000" />
+          <Input
+            id="phone"
+            type="tel"
+            {...register("phone", {
+              onChange: (e) => {
+                e.target.value = formatPhone(e.target.value)
+              },
+            })}
+            placeholder="(11) 99999-9999"
+            maxLength={15}
+          />
         </div>
 
         <div className="space-y-2">

@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PlusIcon } from "lucide-react"
+import { PlusIcon, EyeIcon, EyeOffIcon } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   Select,
@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { formatPhone } from "@/lib/utils"
 
 interface CreateUserForm {
   name: string
@@ -36,6 +37,7 @@ interface CreateUserForm {
 
 export function CreateUserDialog() {
   const [open, setOpen] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const { toast } = useToast()
   const utils = trpc.useUtils()
 
@@ -102,11 +104,27 @@ export function CreateUserDialog() {
 
           <div className="space-y-2">
             <Label htmlFor="password">Senha *</Label>
-            <Input
-              id="password"
-              type="password"
-              {...register("password", { required: "Senha é obrigatória", minLength: 6 })}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...register("password", { required: "Senha é obrigatória", minLength: 6 })}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <EyeIcon className="h-4 w-4 text-muted-foreground" />
+                )}
+              </Button>
+            </div>
             {errors.password && (
               <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
@@ -127,7 +145,17 @@ export function CreateUserDialog() {
 
           <div className="space-y-2">
             <Label htmlFor="phone">Telefone</Label>
-            <Input id="phone" type="tel" {...register("phone")} />
+            <Input
+              id="phone"
+              type="tel"
+              {...register("phone", {
+                onChange: (e) => {
+                  e.target.value = formatPhone(e.target.value)
+                },
+              })}
+              placeholder="(11) 99999-9999"
+              maxLength={15}
+            />
           </div>
 
           <div className="space-y-2">

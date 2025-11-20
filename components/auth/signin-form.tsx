@@ -10,10 +10,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import { EyeIcon, EyeOffIcon } from "lucide-react"
 
 export function SignInForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
@@ -104,13 +106,29 @@ export function SignInForm() {
       </div>
       <div className="grid gap-2">
         <Label htmlFor="password">Senha</Label>
-        <Input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex={-1}
+          >
+            {showPassword ? (
+              <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <EyeIcon className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
+        </div>
       </div>
       <Button type="submit" disabled={isLoading} className="w-full">
         {isLoading ? "Entrando..." : "Entrar"}
@@ -121,11 +139,7 @@ export function SignInForm() {
           Criar conta
         </Link>
       </div>
-      <div className="text-sm text-muted-foreground">
-        <p className="font-medium mb-1">Contas de demonstração:</p>
-        <p>Bibliotecário: librarian@library.com / librarian123</p>
-        <p>Membro: member@library.com / member123</p>
-      </div>
     </form>
   )
 }
+
