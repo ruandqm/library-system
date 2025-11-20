@@ -1,11 +1,19 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { BookOpenIcon, UsersIcon, BookMarkedIcon, CalendarIcon, LogOutIcon, UserIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import {
+  BookOpenIcon,
+  UsersIcon,
+  BookMarkedIcon,
+  CalendarIcon,
+  LogOutIcon,
+  UserIcon,
+  TagIcon,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,51 +21,59 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 interface AdminNavProps {
   user: {
-    name?: string | null
-    email?: string | null
-    role: string
-  }
+    name?: string | null;
+    email?: string | null;
+    role: string;
+  };
 }
 
 export function AdminNav({ user }: AdminNavProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const navItems = [
     { href: "/admin", label: "Painel", icon: BookOpenIcon },
     { href: "/admin/books", label: "Livros", icon: BookMarkedIcon },
+    { href: "/admin/categories", label: "Categorias", icon: TagIcon },
     { href: "/admin/loans", label: "Empréstimos", icon: CalendarIcon },
-    ...(user.role === "LIBRARIAN" ? [{ href: "/admin/users", label: "Usuários", icon: UsersIcon }] : []),
-  ]
+    ...(user.role === "LIBRARIAN"
+      ? [{ href: "/admin/users", label: "Usuários", icon: UsersIcon }]
+      : []),
+  ];
 
   return (
     <>
       <header className="border-b bg-background">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3 sm:gap-6">
-            <Link href="/admin" className="flex items-center gap-2 font-semibold">
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 font-semibold"
+            >
               <BookOpenIcon className="size-6" />
               <span>Gestão da Biblioteca</span>
             </Link>
             <nav className="hidden items-center gap-1 md:flex">
               {navItems.map((item) => {
-                const Icon = item.icon
+                const Icon = item.icon;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={cn(
                       "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted",
-                      pathname === item.href ? "bg-muted" : "text-muted-foreground",
+                      pathname === item.href
+                        ? "bg-muted"
+                        : "text-muted-foreground"
                     )}
                   >
                     <Icon className="size-4" />
                     {item.label}
                   </Link>
-                )
+                );
               })}
             </nav>
           </div>
@@ -81,7 +97,10 @@ export function AdminNav({ user }: AdminNavProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/auth/signin" })} className="text-destructive">
+              <DropdownMenuItem
+                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                className="text-destructive"
+              >
                 <LogOutIcon className="size-4" />
                 Sair
               </DropdownMenuItem>
@@ -94,24 +113,24 @@ export function AdminNav({ user }: AdminNavProps) {
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 md:hidden">
         <div className="flex h-14 items-center justify-around px-4">
           {navItems.map((item) => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
                   "flex flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium",
-                  isActive ? "text-primary" : "text-muted-foreground",
+                  isActive ? "text-primary" : "text-muted-foreground"
                 )}
               >
                 <Icon className="size-5" />
                 <span className="line-clamp-1">{item.label}</span>
               </Link>
-            )
+            );
           })}
         </div>
       </nav>
     </>
-  )
+  );
 }

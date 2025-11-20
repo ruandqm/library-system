@@ -14,17 +14,81 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpenIcon, BookmarkIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { BookDetailsDialog } from "./book-details-dialog";
 import type { Book } from "@/domain/entities/book.entity";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-export function BooksGrid() {
+interface BooksGridProps {
+  searchQuery?: string;
+  categoryId?: string | null;
+}
+
+const BOOKS_PER_PAGE = 12;
+
+export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProps) {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const { toast } = useToast();
   const utils = trpc.useUtils();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const { data: books, isLoading } = trpc.book.getAll.useQuery();
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = trpc.book.getAllPaginated.useInfiniteQuery(
+    {
+      limit: BOOKS_PER_PAGE,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    }
+  );
+
+  // Filter books based on search and category
+  const filteredBooks = useMemo(() => {
+    if (!data) return [];
+
+    const allBooks = data.pages.flatMap((page) => page.books);
+
+    return allBooks.filter((book) => {
+      const matchesSearch =
+        !searchQuery ||
+        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        book.isbn.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        book.categoryName?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesCategory = !categoryId || book.categoryId === categoryId;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [data, searchQuery, categoryId]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const createReservation = trpc.reservation.create.useMutation({
     onSuccess: () => {
@@ -55,13 +119,17 @@ export function BooksGrid() {
     );
   }
 
-  if (!books || books.length === 0) {
+  if (!data || filteredBooks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <BookOpenIcon className="size-12 text-muted-foreground" />
-        <p className="mt-4 text-lg font-medium">Nenhum livro disponível</p>
+        <p className="mt-4 text-lg font-medium">
+          {searchQuery || categoryId ? "Nenhum livro encontrado" : "Nenhum livro disponível"}
+        </p>
         <p className="text-sm text-muted-foreground">
-          Volte mais tarde para novas adições
+          {searchQuery || categoryId
+            ? "Tente ajustar seus filtros de busca"
+            : "Volte mais tarde para novas adições"}
         </p>
       </div>
     );
@@ -70,7 +138,7 @@ export function BooksGrid() {
   return (
     <>
       <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {books.map((book) => (
+        {filteredBooks.map((book) => (
           <Card key={book.id} className="flex flex-col" data-testid="book-card">
             <CardHeader>
               <div className="mb-2 flex items-start justify-between">
@@ -101,10 +169,12 @@ export function BooksGrid() {
                 />
               </AspectRatio>
               <div className="space-y-2 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Categoria:</span>{" "}
-                  {book.category}
-                </div>
+                {book.categoryName && (
+                  <div>
+                    <span className="text-muted-foreground">Categoria:</span>{" "}
+                    {book.categoryName}
+                  </div>
+                )}
                 {book.publishedYear && (
                   <div>
                     <span className="text-muted-foreground">Ano:</span>{" "}
@@ -141,6 +211,22 @@ export function BooksGrid() {
           </Card>
         ))}
       </div>
+
+      {/* Infinite scroll trigger */}
+      {hasNextPage && (
+        <div ref={loadMoreRef} className="flex items-center justify-center py-8">
+          {isFetchingNextPage && <Spinner className="size-6" />}
+        </div>
+      )}
+
+      {/* Show message when all books are loaded */}
+      {!hasNextPage && filteredBooks.length > 0 && (
+        <div className="flex items-center justify-center py-8">
+          <p className="text-sm text-muted-foreground">
+            Todos os livros foram carregados
+          </p>
+        </div>
+      )}
 
       {selectedBook && (
         <BookDetailsDialog

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { CreateBookInput } from "@/domain/entities/book.entity";
@@ -24,13 +25,18 @@ export function CreateBookDialog() {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const utils = trpc.useUtils();
+  const { data: categories } = trpc.category.getAll.useQuery();
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateBookInput>();
+
+  const categoryId = watch("categoryId");
 
   const createBook = trpc.book.create.useMutation({
     onSuccess: () => {
@@ -125,16 +131,26 @@ export function CreateBookDialog() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Categoria *</Label>
-              <Input
-                id="category"
-                {...register("category", {
-                  required: "Categoria é obrigatória",
-                })}
-              />
-              {errors.category && (
+              <Label htmlFor="categoryId">Categoria *</Label>
+              <Select
+                value={categoryId}
+                onValueChange={(value) => setValue("categoryId", value, { shouldValidate: true })}
+                required
+              >
+                <SelectTrigger id="categoryId">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories?.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.categoryId && (
                 <p className="text-sm text-destructive">
-                  {errors.category.message}
+                  {errors.categoryId.message}
                 </p>
               )}
             </div>

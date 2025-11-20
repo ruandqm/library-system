@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import type { Book, UpdateBookInput } from "@/domain/entities/book.entity"
 
@@ -27,13 +28,18 @@ interface UpdateBookDialogProps {
 export function UpdateBookDialog({ book, open, onOpenChange }: UpdateBookDialogProps) {
   const { toast } = useToast()
   const utils = trpc.useUtils()
+  const { data: categories } = trpc.category.getAll.useQuery()
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<UpdateBookInput>()
+
+  const categoryId = watch("categoryId")
 
   useEffect(() => {
     if (book) {
@@ -41,7 +47,7 @@ export function UpdateBookDialog({ book, open, onOpenChange }: UpdateBookDialogP
         title: book.title,
         author: book.author,
         isbn: book.isbn,
-        category: book.category,
+        categoryId: book.categoryId,
         publisher: book.publisher,
         publishedYear: book.publishedYear,
         totalCopies: book.totalCopies,
@@ -103,8 +109,22 @@ export function UpdateBookDialog({ book, open, onOpenChange }: UpdateBookDialogP
               <Input id="isbn" {...register("isbn")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Categoria</Label>
-              <Input id="category" {...register("category")} />
+              <Label htmlFor="categoryId">Categoria</Label>
+              <Select
+                value={categoryId}
+                onValueChange={(value) => setValue("categoryId", value)}
+              >
+                <SelectTrigger id="categoryId">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories?.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

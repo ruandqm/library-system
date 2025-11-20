@@ -5,6 +5,7 @@ import type React from "react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,6 +80,12 @@ export function SignInForm() {
       <Button type="submit" disabled={isLoading} className="w-full">
         {isLoading ? "Entrando..." : "Entrar"}
       </Button>
+      <div className="text-center text-sm text-muted-foreground">
+        Não tem uma conta?{" "}
+        <Link href="/auth/signup" className="text-primary hover:underline">
+          Criar conta
+        </Link>
+      </div>
       <div className="text-sm text-muted-foreground">
         <p className="font-medium mb-1">Contas de demonstração:</p>
         <p>Bibliotecário: librarian@library.com / librarian123</p>

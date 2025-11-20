@@ -65,10 +65,12 @@ export function BookDetailsDialog({ book, open, onOpenChange }: BookDetailsDialo
               <p className="text-sm font-medium">ISBN</p>
               <p className="text-sm text-muted-foreground">{book.isbn}</p>
             </div>
-            <div>
-              <p className="text-sm font-medium">Categoria</p>
-              <p className="text-sm text-muted-foreground">{book.category}</p>
-            </div>
+            {book.categoryName && (
+              <div>
+                <p className="text-sm font-medium">Categoria</p>
+                <p className="text-sm text-muted-foreground">{book.categoryName}</p>
+              </div>
+            )}
             {book.publisher && (
               <div>
                 <p className="text-sm font-medium">Editora</p>

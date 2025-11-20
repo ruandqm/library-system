@@ -15,6 +15,25 @@ export const bookRouter = router({
     return await useCase.execute()
   }),
 
+  getAllPaginated: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(50).default(12),
+        cursor: z.number().default(0),
+      }),
+    )
+    .query(async ({ input }) => {
+      const { books, total } = await bookRepository.findAllPaginated(
+        input.limit,
+        input.cursor
+      )
+      return {
+        books,
+        nextCursor: input.cursor + books.length < total ? input.cursor + books.length : null,
+        total,
+      }
+    }),
+
   search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
     const useCase = new SearchBooksUseCase(bookRepository)
     return await useCase.execute(input.query)
@@ -28,7 +47,7 @@ export const bookRouter = router({
         isbn: z.string().min(1),
         publisher: z.string().optional(),
         publishedYear: z.number().optional(),
-        category: z.string().min(1),
+        categoryId: z.string().min(1),
         description: z.string().optional(),
         coverImage: z.string().optional(),
         totalCopies: z.number().min(1),
@@ -48,7 +67,7 @@ export const bookRouter = router({
         isbn: z.string().min(1).optional(),
         publisher: z.string().optional(),
         publishedYear: z.number().optional(),
-        category: z.string().min(1).optional(),
+        categoryId: z.string().min(1).optional(),
         description: z.string().optional(),
         coverImage: z.string().optional(),
         totalCopies: z.number().min(1).optional(),

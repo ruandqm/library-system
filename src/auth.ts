@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { MongoDBUserRepository } from "@/infrastructure/repositories/mongodb-user.repository";
+import { UserRole } from "@/domain/entities/user.entity";
 
 const userRepository = new MongoDBUserRepository();
 
@@ -54,8 +55,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+        session.user.id = token.id as string;
+        session.user.role = token.role as UserRole;
       }
       return session;
     },

@@ -4,10 +4,28 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { SearchIcon } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { trpc } from "@/lib/trpc"
 
-export function BookSearch() {
+interface BookSearchProps {
+  onSearchChange?: (query: string) => void
+  onCategoryChange?: (categoryId: string | null) => void
+}
+
+export function BookSearch({ onSearchChange, onCategoryChange }: BookSearchProps) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [category, setCategory] = useState("all")
+  const [categoryId, setCategoryId] = useState<string | null>(null)
+  const { data: categories } = trpc.category.getAll.useQuery()
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    onSearchChange?.(value)
+  }
+
+  const handleCategoryChange = (value: string) => {
+    const newCategoryId = value === "all" ? null : value
+    setCategoryId(newCategoryId)
+    onCategoryChange?.(newCategoryId)
+  }
 
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row">
@@ -16,21 +34,21 @@ export function BookSearch() {
         <Input
           placeholder="Pesquise por título, autor ou ISBN..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           className="pl-9"
         />
       </div>
-      <Select value={category} onValueChange={setCategory}>
+      <Select value={categoryId || "all"} onValueChange={handleCategoryChange}>
         <SelectTrigger className="w-full sm:w-[200px]">
           <SelectValue placeholder="Categoria" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Todas as Categorias</SelectItem>
-          <SelectItem value="fiction">Ficção</SelectItem>
-          <SelectItem value="non-fiction">Não-ficção</SelectItem>
-          <SelectItem value="science">Ciência</SelectItem>
-          <SelectItem value="history">História</SelectItem>
-          <SelectItem value="technology">Tecnologia</SelectItem>
+          {categories?.map((category) => (
+            <SelectItem key={category.id} value={category.id}>
+              {category.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

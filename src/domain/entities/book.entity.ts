@@ -7,7 +7,8 @@ export interface Book {
   isbn: string
   publisher?: string
   publishedYear?: number
-  category: string
+  categoryId: string
+  categoryName?: string // Populated from category collection
   description?: string
   coverImage?: string
   totalCopies: number
@@ -23,7 +24,7 @@ export interface CreateBookInput {
   isbn: string
   publisher?: string
   publishedYear?: number
-  category: string
+  categoryId: string
   description?: string
   coverImage?: string
   totalCopies: number
@@ -35,7 +36,7 @@ export interface UpdateBookInput {
   isbn?: string
   publisher?: string
   publishedYear?: number
-  category?: string
+  categoryId?: string
   description?: string
   coverImage?: string
   totalCopies?: number

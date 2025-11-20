@@ -83,7 +83,7 @@ export function BooksTable() {
                   <TableCell className="font-medium">{book.title}</TableCell>
                   <TableCell>{book.author}</TableCell>
                   <TableCell>{book.isbn}</TableCell>
-                  <TableCell>{book.category}</TableCell>
+                  <TableCell>{book.categoryName || "-"}</TableCell>
                   <TableCell>
                     {book.availableCopies} / {book.totalCopies}
                   </TableCell>
