@@ -14,7 +14,7 @@ export const categoryRouter = router({
     .input(
       z.object({
         name: z.string().min(1, "Nome da categoria é obrigatório"),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       // Check if category already exists
@@ -33,4 +33,3 @@ export const categoryRouter = router({
     await categoryRepository.delete(input.id)
   }),
 })
-

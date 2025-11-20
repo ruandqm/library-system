@@ -1,8 +1,17 @@
+import { config } from "dotenv"
+import { resolve } from "path"
 import { MongoClient } from "mongodb"
 import bcrypt from "bcryptjs"
 
+// Load environment variables from .env file
+config({ path: resolve(process.cwd(), ".env.local") })
+config({ path: resolve(process.cwd(), ".env") })
+
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017"
 const MONGODB_DB = process.env.MONGODB_DB || "library"
+
+console.log("MONGODB_URI:", MONGODB_URI)
+console.log("MONGODB_DB:", MONGODB_DB)
 
 async function createSampleUsers() {
   const client = new MongoClient(MONGODB_URI)

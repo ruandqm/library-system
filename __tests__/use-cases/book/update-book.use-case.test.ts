@@ -59,7 +59,9 @@ describe("UpdateBookUseCase", () => {
   it("should throw error when book not found", async () => {
     vi.mocked(mockBookRepository.findById).mockResolvedValue(null)
 
-    await expect(updateBookUseCase.execute("999", { title: "New Title" })).rejects.toThrow("Book not found")
+    await expect(updateBookUseCase.execute("999", { title: "New Title" })).rejects.toThrow(
+      "Book not found"
+    )
 
     expect(mockBookRepository.findById).toHaveBeenCalledWith("999")
     expect(mockBookRepository.update).not.toHaveBeenCalled()

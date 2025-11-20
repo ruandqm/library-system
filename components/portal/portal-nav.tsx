@@ -49,7 +49,7 @@ export function PortalNav({ user }: PortalNavProps) {
                     href={item.href}
                     className={cn(
                       "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted",
-                      pathname === item.href ? "bg-muted" : "text-muted-foreground",
+                      pathname === item.href ? "bg-muted" : "text-muted-foreground"
                     )}
                   >
                     <Icon className="size-4" />
@@ -79,7 +79,10 @@ export function PortalNav({ user }: PortalNavProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/auth/signin" })} className="text-destructive">
+              <DropdownMenuItem
+                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                className="text-destructive"
+              >
                 <LogOutIcon className="size-4" />
                 Sair
               </DropdownMenuItem>
@@ -100,7 +103,7 @@ export function PortalNav({ user }: PortalNavProps) {
                 href={item.href}
                 className={cn(
                   "flex flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium",
-                  isActive ? "text-primary" : "text-muted-foreground",
+                  isActive ? "text-primary" : "text-muted-foreground"
                 )}
               >
                 <Icon className="size-5" />

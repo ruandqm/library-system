@@ -7,7 +7,9 @@ export default function ProfilePage() {
     <div className="container mx-auto max-w-4xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Meu Perfil</h1>
-        <p className="text-muted-foreground">Gerencie as informações da sua conta e veja sua atividade</p>
+        <p className="text-muted-foreground">
+          Gerencie as informações da sua conta e veja sua atividade
+        </p>
       </div>
 
       <div className="grid gap-6">

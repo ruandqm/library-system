@@ -8,4 +8,3 @@ export interface Category {
 export interface CreateCategoryInput {
   name: string
 }
-

@@ -99,13 +99,19 @@ export class MongoDBReservationRepository implements ReservationRepository {
     const db = await getDatabase()
     await db
       .collection(this.collectionName)
-      .updateOne({ _id: new ObjectId(id) }, { $set: { status: "CANCELLED", updatedAt: new Date() } })
+      .updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { status: "CANCELLED", updatedAt: new Date() } }
+      )
   }
 
   async fulfill(id: string): Promise<void> {
     const db = await getDatabase()
     await db
       .collection(this.collectionName)
-      .updateOne({ _id: new ObjectId(id) }, { $set: { status: "FULFILLED", updatedAt: new Date() } })
+      .updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { status: "FULFILLED", updatedAt: new Date() } }
+      )
   }
 }

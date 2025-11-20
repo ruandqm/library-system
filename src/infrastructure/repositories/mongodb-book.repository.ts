@@ -11,7 +11,9 @@ export class MongoDBBookRepository implements BookRepository {
     let categoryName: string | undefined
 
     if (book.categoryId) {
-      const category = await db.collection("categories").findOne({ _id: new ObjectId(book.categoryId) })
+      const category = await db
+        .collection("categories")
+        .findOne({ _id: new ObjectId(book.categoryId) })
       categoryName = category?.name
     }
 
@@ -73,9 +75,7 @@ export class MongoDBBookRepository implements BookRepository {
       .find({ _id: { $in: categoryIds.map((id) => new ObjectId(id)) } })
       .toArray()
 
-    const categoryMap = new Map(
-      categories.map((cat) => [cat._id.toString(), cat.name])
-    )
+    const categoryMap = new Map(categories.map((cat) => [cat._id.toString(), cat.name]))
 
     return books.map((book) => ({
       id: book._id.toString(),
@@ -98,10 +98,10 @@ export class MongoDBBookRepository implements BookRepository {
 
   async findAllPaginated(limit: number, offset: number): Promise<{ books: Book[]; total: number }> {
     const db = await getDatabase()
-    
+
     // Get total count
     const total = await db.collection(this.collectionName).countDocuments()
-    
+
     // Get paginated books
     const books = await db
       .collection(this.collectionName)
@@ -120,9 +120,7 @@ export class MongoDBBookRepository implements BookRepository {
       .find({ _id: { $in: categoryIds.map((id) => new ObjectId(id)) } })
       .toArray()
 
-    const categoryMap = new Map(
-      categories.map((cat) => [cat._id.toString(), cat.name])
-    )
+    const categoryMap = new Map(categories.map((cat) => [cat._id.toString(), cat.name]))
 
     const populatedBooks = books.map((book) => ({
       id: book._id.toString(),
@@ -152,7 +150,9 @@ export class MongoDBBookRepository implements BookRepository {
       updatedAt: new Date(),
     }
 
-    await db.collection(this.collectionName).updateOne({ _id: new ObjectId(id) }, { $set: updateDoc })
+    await db
+      .collection(this.collectionName)
+      .updateOne({ _id: new ObjectId(id) }, { $set: updateDoc })
 
     const book = await this.findById(id)
     if (!book) throw new Error("Book not found after update")
@@ -171,12 +171,15 @@ export class MongoDBBookRepository implements BookRepository {
 
     await db
       .collection(this.collectionName)
-      .updateOne({ _id: new ObjectId(id) }, { $set: { availableCopies, status, updatedAt: new Date() } })
+      .updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { availableCopies, status, updatedAt: new Date() } }
+      )
   }
 
   async search(query: string): Promise<Book[]> {
     const db = await getDatabase()
-    
+
     // First, find matching categories
     const matchingCategories = await db
       .collection("categories")
@@ -207,9 +210,7 @@ export class MongoDBBookRepository implements BookRepository {
       .find({ _id: { $in: allCategoryIds.map((id) => new ObjectId(id)) } })
       .toArray()
 
-    const categoryMap = new Map(
-      categories.map((cat) => [cat._id.toString(), cat.name])
-    )
+    const categoryMap = new Map(categories.map((cat) => [cat._id.toString(), cat.name]))
 
     return books.map((book) => ({
       id: book._id.toString(),

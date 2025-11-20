@@ -40,7 +40,7 @@ jobs:
     env:
       # MONGODB_URI is not strictly needed as we use mongodb-memory-server
       # but we keep it to satisfy any validation that checks for its existence
-      MONGODB_URI: mongodb://localhost:27017 
+      MONGODB_URI: mongodb://localhost:27017
       MONGODB_DB: library-test
       NEXTAUTH_SECRET: test-secret-key
       NEXTAUTH_URL: http://localhost:3000

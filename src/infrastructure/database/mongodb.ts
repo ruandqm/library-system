@@ -1,4 +1,4 @@
-import { MongoClient, type Db } from "mongodb"
+import { MongoClient, type Db, type MongoClientOptions } from "mongodb"
 
 let client: MongoClient | null = null
 let db: Db | null = null
@@ -12,7 +12,34 @@ export async function connectToDatabase(): Promise<Db> {
     throw new Error("MONGODB_URI environment variable is not defined")
   }
 
-  client = new MongoClient(process.env.MONGODB_URI)
+  const uri = process.env.MONGODB_URI
+  const isAtlas = uri.includes("mongodb.net") || uri.includes("atlas")
+  const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL
+
+  // Configure MongoDB client options
+  const options: MongoClientOptions = {
+    // Enable TLS/SSL for Atlas or production environments
+    ...(isAtlas || isProduction
+      ? {
+          tls: true,
+          // MongoDB Atlas uses valid certificates, so don't allow invalid ones in production
+          tlsAllowInvalidCertificates: false,
+        }
+      : {}),
+    // Connection pool options for serverless environments
+    maxPoolSize: isProduction ? 1 : 10, // Serverless works better with smaller pools
+    minPoolSize: isProduction ? 0 : 1,
+    // Server selection timeout
+    serverSelectionTimeoutMS: 10000,
+    // Socket timeout
+    socketTimeoutMS: 45000,
+    // Connection timeout
+    connectTimeoutMS: 10000,
+    // Retry writes for better reliability
+    retryWrites: true,
+  }
+
+  client = new MongoClient(uri, options)
   await client.connect()
   db = client.db(process.env.MONGODB_DB || "library")
 

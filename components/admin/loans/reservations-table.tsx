@@ -2,7 +2,14 @@
 
 import { useState } from "react"
 import { trpc } from "@/lib/trpc"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -106,7 +113,9 @@ export function ReservationsTable() {
                 <TableRow key={reservation.id}>
                   <TableCell className="font-medium">{getBookTitle(reservation.bookId)}</TableCell>
                   <TableCell>{getUserName(reservation.userId)}</TableCell>
-                  <TableCell>{format(new Date(reservation.reservationDate), "MMM dd, yyyy")}</TableCell>
+                  <TableCell>
+                    {format(new Date(reservation.reservationDate), "MMM dd, yyyy")}
+                  </TableCell>
                   <TableCell>{format(new Date(reservation.expiryDate), "MMM dd, yyyy")}</TableCell>
                   <TableCell>{getStatusBadge(reservation.status)}</TableCell>
                   <TableCell className="text-right">

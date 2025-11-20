@@ -68,4 +68,3 @@ export class MongoDBCategoryRepository implements CategoryRepository {
     await db.collection(this.collectionName).deleteOne({ _id: new ObjectId(id) })
   }
 }
-

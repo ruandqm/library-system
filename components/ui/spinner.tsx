@@ -6,7 +6,10 @@ interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {}
 export function Spinner({ className, ...props }: SpinnerProps) {
   return (
     <div
-      className={cn("inline-block animate-spin rounded-full border-2 border-current border-t-transparent", className)}
+      className={cn(
+        "inline-block animate-spin rounded-full border-2 border-current border-t-transparent",
+        className
+      )}
       {...props}
     >
       <span className="sr-only">Loading...</span>

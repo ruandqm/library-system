@@ -14,7 +14,7 @@ export const userRouter = router({
         password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
         phone: z.string().optional(),
         address: z.string().optional(),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       // Check if user already exists
@@ -58,7 +58,7 @@ export const userRouter = router({
         role: z.enum(["LIBRARIAN", "MEMBER"]),
         phone: z.string().optional(),
         address: z.string().optional(),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       return await userRepository.create(input)
@@ -70,7 +70,7 @@ export const userRouter = router({
         name: z.string().min(1).optional(),
         phone: z.string().optional(),
         address: z.string().optional(),
-      }),
+      })
     )
     .mutation(async ({ input, ctx }) => {
       return await userRepository.update(ctx.session.user.id, input)

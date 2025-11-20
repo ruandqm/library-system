@@ -64,7 +64,7 @@ export const createMockRepository = <T extends Record<string, any>>() => {
         }
         return methods[prop]
       },
-    },
+    }
   )
   return mockRepo as T
 }

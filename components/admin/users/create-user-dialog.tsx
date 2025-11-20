@@ -17,7 +17,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PlusIcon } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface CreateUserForm {
   name: string
@@ -86,7 +92,11 @@ export function CreateUserDialog() {
 
           <div className="space-y-2">
             <Label htmlFor="email">E-mail *</Label>
-            <Input id="email" type="email" {...register("email", { required: "E-mail é obrigatório" })} />
+            <Input
+              id="email"
+              type="email"
+              {...register("email", { required: "E-mail é obrigatório" })}
+            />
             {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
           </div>
 
@@ -97,7 +107,9 @@ export function CreateUserDialog() {
               type="password"
               {...register("password", { required: "Senha é obrigatória", minLength: 6 })}
             />
-            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-sm text-destructive">{errors.password.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">

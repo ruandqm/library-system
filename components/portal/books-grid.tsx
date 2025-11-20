@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc"
 import {
   Card,
   CardContent,
@@ -8,50 +8,45 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { BookOpenIcon, BookmarkIcon } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
-import { useToast } from "@/hooks/use-toast";
-import { useState, useMemo, useEffect, useRef } from "react";
-import { BookDetailsDialog } from "./book-details-dialog";
-import type { Book } from "@/domain/entities/book.entity";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { BookOpenIcon, BookmarkIcon } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
+import { useToast } from "@/hooks/use-toast"
+import { useState, useMemo, useEffect, useRef } from "react"
+import { BookDetailsDialog } from "./book-details-dialog"
+import type { Book } from "@/domain/entities/book.entity"
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 
 interface BooksGridProps {
-  searchQuery?: string;
-  categoryId?: string | null;
+  searchQuery?: string
+  categoryId?: string | null
 }
 
-const BOOKS_PER_PAGE = 12;
+const BOOKS_PER_PAGE = 12
 
 export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProps) {
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const { toast } = useToast();
-  const utils = trpc.useUtils();
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null)
+  const { toast } = useToast()
+  const utils = trpc.useUtils()
+  const loadMoreRef = useRef<HTMLDivElement>(null)
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = trpc.book.getAllPaginated.useInfiniteQuery(
-    {
-      limit: BOOKS_PER_PAGE,
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    }
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    trpc.book.getAllPaginated.useInfiniteQuery(
+      {
+        limit: BOOKS_PER_PAGE,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      }
+    )
 
   // Filter books based on search and category
   const filteredBooks = useMemo(() => {
-    if (!data) return [];
+    if (!data) return []
 
-    const allBooks = data.pages.flatMap((page) => page.books);
+    const allBooks = data.pages.flatMap((page) => page.books)
 
     return allBooks.filter((book) => {
       const matchesSearch =
@@ -59,64 +54,64 @@ export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProp
         book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
         book.isbn.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        book.categoryName?.toLowerCase().includes(searchQuery.toLowerCase());
+        book.categoryName?.toLowerCase().includes(searchQuery.toLowerCase())
 
-      const matchesCategory = !categoryId || book.categoryId === categoryId;
+      const matchesCategory = !categoryId || book.categoryId === categoryId
 
-      return matchesSearch && matchesCategory;
-    });
-  }, [data, searchQuery, categoryId]);
+      return matchesSearch && matchesCategory
+    })
+  }, [data, searchQuery, categoryId])
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
+          fetchNextPage()
         }
       },
       { threshold: 0.1 }
-    );
+    )
 
-    const currentRef = loadMoreRef.current;
+    const currentRef = loadMoreRef.current
     if (currentRef) {
-      observer.observe(currentRef);
+      observer.observe(currentRef)
     }
 
     return () => {
       if (currentRef) {
-        observer.unobserve(currentRef);
+        observer.unobserve(currentRef)
       }
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const createReservation = trpc.reservation.create.useMutation({
     onSuccess: () => {
       toast({
         title: "Sucesso",
         description: "Livro reservado com sucesso",
-      });
-      utils.reservation.getMyReservations.invalidate();
+      })
+      utils.reservation.getMyReservations.invalidate()
     },
     onError: (error) => {
       toast({
         title: "Erro",
         description: error.message,
         variant: "destructive",
-      });
+      })
     },
-  });
+  })
 
   const handleReserve = (bookId: string) => {
-    createReservation.mutate({ bookId });
-  };
+    createReservation.mutate({ bookId })
+  }
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Spinner className="size-8" />
       </div>
-    );
+    )
   }
 
   if (!data || filteredBooks.length === 0) {
@@ -132,7 +127,7 @@ export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProp
             : "Volte mais tarde para novas adições"}
         </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -142,9 +137,7 @@ export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProp
           <Card key={book.id} className="flex flex-col" data-testid="book-card">
             <CardHeader>
               <div className="mb-2 flex items-start justify-between">
-                <Badge
-                  variant={book.availableCopies > 0 ? "default" : "secondary"}
-                >
+                <Badge variant={book.availableCopies > 0 ? "default" : "secondary"}>
                   {book.availableCopies > 0 ? "Disponível" : "Indisponível"}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
@@ -152,15 +145,10 @@ export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProp
                 </span>
               </div>
               <CardTitle className="line-clamp-2">{book.title}</CardTitle>
-              <CardDescription className="line-clamp-1">
-                {book.author}
-              </CardDescription>
+              <CardDescription className="line-clamp-1">{book.author}</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <AspectRatio
-                ratio={3 / 4}
-                className="mb-4 overflow-hidden rounded-md bg-muted"
-              >
+              <AspectRatio ratio={3 / 4} className="mb-4 overflow-hidden rounded-md bg-muted">
                 <img
                   src={book.coverImage || "/placeholder.jpg"}
                   alt={book.title}
@@ -171,20 +159,16 @@ export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProp
               <div className="space-y-2 text-sm">
                 {book.categoryName && (
                   <div>
-                    <span className="text-muted-foreground">Categoria:</span>{" "}
-                    {book.categoryName}
+                    <span className="text-muted-foreground">Categoria:</span> {book.categoryName}
                   </div>
                 )}
                 {book.publishedYear && (
                   <div>
-                    <span className="text-muted-foreground">Ano:</span>{" "}
-                    {book.publishedYear}
+                    <span className="text-muted-foreground">Ano:</span> {book.publishedYear}
                   </div>
                 )}
                 {book.description && (
-                  <p className="line-clamp-3 text-muted-foreground">
-                    {book.description}
-                  </p>
+                  <p className="line-clamp-3 text-muted-foreground">{book.description}</p>
                 )}
               </div>
             </CardContent>
@@ -200,9 +184,7 @@ export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProp
               <Button
                 className="flex-1"
                 onClick={() => handleReserve(book.id)}
-                disabled={
-                  book.availableCopies === 0 || createReservation.isPending
-                }
+                disabled={book.availableCopies === 0 || createReservation.isPending}
               >
                 <BookmarkIcon className="size-4" />
                 Reservar
@@ -222,9 +204,7 @@ export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProp
       {/* Show message when all books are loaded */}
       {!hasNextPage && filteredBooks.length > 0 && (
         <div className="flex items-center justify-center py-8">
-          <p className="text-sm text-muted-foreground">
-            Todos os livros foram carregados
-          </p>
+          <p className="text-sm text-muted-foreground">Todos os livros foram carregados</p>
         </div>
       )}
 
@@ -236,5 +216,5 @@ export function BooksGrid({ searchQuery = "", categoryId = null }: BooksGridProp
         />
       )}
     </>
-  );
+  )
 }

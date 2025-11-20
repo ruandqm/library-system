@@ -7,7 +7,8 @@ import { Spinner } from "@/components/ui/spinner"
 
 export function ProfileStats() {
   const { data: loans, isLoading: loansLoading } = trpc.loan.getMyLoans.useQuery()
-  const { data: reservations, isLoading: reservationsLoading } = trpc.reservation.getMyReservations.useQuery()
+  const { data: reservations, isLoading: reservationsLoading } =
+    trpc.reservation.getMyReservations.useQuery()
 
   const activeLoans = loans?.filter((loan) => loan.status === "ACTIVE").length || 0
   const activeReservations = reservations?.filter((res) => res.status === "PENDING").length || 0

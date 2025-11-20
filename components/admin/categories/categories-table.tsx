@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { useState } from "react"
+import { trpc } from "@/lib/trpc"
 import {
   Table,
   TableBody,
@@ -9,12 +9,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { SearchIcon, TrashIcon } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
-import { useToast } from "@/hooks/use-toast";
+} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { SearchIcon, TrashIcon } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
+import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,45 +24,45 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog"
 
 export function CategoriesTable() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null);
-  const { toast } = useToast();
-  const utils = trpc.useUtils();
+  const [searchQuery, setSearchQuery] = useState("")
+  const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null)
+  const { toast } = useToast()
+  const utils = trpc.useUtils()
 
-  const { data: categories, isLoading } = trpc.category.getAll.useQuery();
+  const { data: categories, isLoading } = trpc.category.getAll.useQuery()
 
   const deleteCategory = trpc.category.delete.useMutation({
     onSuccess: () => {
       toast({
         title: "Sucesso",
         description: "Categoria excluída com sucesso",
-      });
-      utils.category.getAll.invalidate();
-      utils.book.getAll.invalidate(); // Invalidate books to refresh category names
-      setDeleteCategoryId(null);
+      })
+      utils.category.getAll.invalidate()
+      utils.book.getAll.invalidate() // Invalidate books to refresh category names
+      setDeleteCategoryId(null)
     },
     onError: (error) => {
       toast({
         title: "Erro",
         description: error.message,
         variant: "destructive",
-      });
+      })
     },
-  });
+  })
 
   const filteredCategories = categories?.filter((category) =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  )
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Spinner className="size-8" />
       </div>
-    );
+    )
   }
 
   return (
@@ -116,24 +116,19 @@ export function CategoriesTable() {
         </Table>
       </div>
 
-      <AlertDialog
-        open={!!deleteCategoryId}
-        onOpenChange={() => setDeleteCategoryId(null)}
-      >
+      <AlertDialog open={!!deleteCategoryId} onOpenChange={() => setDeleteCategoryId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              Isso excluirá permanentemente esta categoria. Essa ação não pode ser
-              desfeita. Livros que usam esta categoria podem ficar sem categoria.
+              Isso excluirá permanentemente esta categoria. Essa ação não pode ser desfeita. Livros
+              que usam esta categoria podem ficar sem categoria.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() =>
-                deleteCategoryId && deleteCategory.mutate({ id: deleteCategoryId })
-              }
+              onClick={() => deleteCategoryId && deleteCategory.mutate({ id: deleteCategoryId })}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
               {deleteCategory.isPending ? "Excluindo..." : "Excluir"}
@@ -142,6 +137,5 @@ export function CategoriesTable() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
+  )
 }
-

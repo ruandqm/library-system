@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { trpc } from "@/lib/trpc";
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { trpc } from "@/lib/trpc"
 import {
   Dialog,
   DialogContent,
@@ -11,51 +11,51 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { PlusIcon } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { PlusIcon } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface CreateCategoryForm {
-  name: string;
+  name: string
 }
 
 export function CreateCategoryDialog() {
-  const [open, setOpen] = useState(false);
-  const { toast } = useToast();
-  const utils = trpc.useUtils();
+  const [open, setOpen] = useState(false)
+  const { toast } = useToast()
+  const utils = trpc.useUtils()
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateCategoryForm>();
+  } = useForm<CreateCategoryForm>()
 
   const createCategory = trpc.category.create.useMutation({
     onSuccess: () => {
       toast({
         title: "Sucesso",
         description: "Categoria criada com sucesso",
-      });
-      utils.category.getAll.invalidate();
-      setOpen(false);
-      reset();
+      })
+      utils.category.getAll.invalidate()
+      setOpen(false)
+      reset()
     },
     onError: (error) => {
       toast({
         title: "Erro",
         description: error.message,
         variant: "destructive",
-      });
+      })
     },
-  });
+  })
 
   const onSubmit = (data: CreateCategoryForm) => {
-    createCategory.mutate(data);
-  };
+    createCategory.mutate(data)
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -80,17 +80,11 @@ export function CreateCategoryDialog() {
               {...register("name", { required: "Nome da categoria é obrigatório" })}
               placeholder="Ex: Ficção, Não-ficção, Ciência..."
             />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            )}
+            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
           </div>
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
             <Button type="submit" disabled={createCategory.isPending}>
@@ -100,6 +94,5 @@ export function CreateCategoryDialog() {
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
-

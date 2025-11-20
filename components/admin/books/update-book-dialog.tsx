@@ -15,7 +15,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import type { Book, UpdateBookInput } from "@/domain/entities/book.entity"
 
@@ -110,10 +116,7 @@ export function UpdateBookDialog({ book, open, onOpenChange }: UpdateBookDialogP
             </div>
             <div className="space-y-2">
               <Label htmlFor="categoryId">Categoria</Label>
-              <Select
-                value={categoryId}
-                onValueChange={(value) => setValue("categoryId", value)}
-              >
+              <Select value={categoryId} onValueChange={(value) => setValue("categoryId", value)}>
                 <SelectTrigger id="categoryId">
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
@@ -151,7 +154,12 @@ export function UpdateBookDialog({ book, open, onOpenChange }: UpdateBookDialogP
 
           <div className="space-y-2">
             <Label htmlFor="coverImage">URL da Imagem de Capa</Label>
-            <Input id="coverImage" type="url" {...register("coverImage")} placeholder="https://..." />
+            <Input
+              id="coverImage"
+              type="url"
+              {...register("coverImage")}
+              placeholder="https://..."
+            />
           </div>
 
           <DialogFooter>

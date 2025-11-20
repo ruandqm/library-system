@@ -2,7 +2,14 @@
 
 import { useState } from "react"
 import { trpc } from "@/lib/trpc"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -124,7 +131,9 @@ export function LoansTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
-                  {searchQuery ? "Nenhum empréstimo encontrado para sua busca." : "Nenhum empréstimo ativo."}
+                  {searchQuery
+                    ? "Nenhum empréstimo encontrado para sua busca."
+                    : "Nenhum empréstimo ativo."}
                 </TableCell>
               </TableRow>
             )}

@@ -1,53 +1,53 @@
-"use client";
+"use client"
 
-import type React from "react";
+import type React from "react"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { trpc } from "@/lib/trpc";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+import { trpc } from "@/lib/trpc"
 
 export function SignUpForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const router = useRouter();
-  const { toast } = useToast();
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [phone, setPhone] = useState("")
+  const [address, setAddress] = useState("")
+  const router = useRouter()
+  const { toast } = useToast()
 
   const signup = trpc.user.signup.useMutation({
     onSuccess: () => {
       toast({
         title: "Sucesso",
         description: "Conta criada com sucesso! Você pode fazer login agora.",
-      });
-      router.push("/auth/signin");
+      })
+      router.push("/auth/signin")
     },
     onError: (error) => {
       toast({
         title: "Erro",
         description: error.message || "Erro ao criar conta",
         variant: "destructive",
-      });
+      })
     },
-  });
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (password !== confirmPassword) {
       toast({
         title: "Erro",
         description: "As senhas não coincidem",
         variant: "destructive",
-      });
-      return;
+      })
+      return
     }
 
     signup.mutate({
@@ -56,8 +56,8 @@ export function SignUpForm() {
       password,
       phone: phone || undefined,
       address: address || undefined,
-    });
-  };
+    })
+  }
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
@@ -144,6 +144,5 @@ export function SignUpForm() {
         </Link>
       </div>
     </form>
-  );
+  )
 }
-

@@ -95,7 +95,9 @@ export default async function AdminDashboard() {
               >
                 <BookMarkedIcon className="size-6 text-primary" />
                 <h3 className="font-semibold">Gerenciar Livros</h3>
-                <p className="text-sm text-muted-foreground">Adicionar, editar ou remover livros da biblioteca</p>
+                <p className="text-sm text-muted-foreground">
+                  Adicionar, editar ou remover livros da biblioteca
+                </p>
               </a>
               <a
                 href="/admin/loans"
@@ -111,7 +113,9 @@ export default async function AdminDashboard() {
               >
                 <UsersIcon className="size-6 text-green-500" />
                 <h3 className="font-semibold">Gerenciar Usuários</h3>
-                <p className="text-sm text-muted-foreground">Visualizar e gerenciar membros da biblioteca</p>
+                <p className="text-sm text-muted-foreground">
+                  Visualizar e gerenciar membros da biblioteca
+                </p>
               </a>
             </div>
           </CardContent>

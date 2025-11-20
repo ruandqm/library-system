@@ -20,13 +20,10 @@ export const bookRouter = router({
       z.object({
         limit: z.number().min(1).max(50).default(12),
         cursor: z.number().default(0),
-      }),
+      })
     )
     .query(async ({ input }) => {
-      const { books, total } = await bookRepository.findAllPaginated(
-        input.limit,
-        input.cursor
-      )
+      const { books, total } = await bookRepository.findAllPaginated(input.limit, input.cursor)
       return {
         books,
         nextCursor: input.cursor + books.length < total ? input.cursor + books.length : null,
@@ -51,7 +48,7 @@ export const bookRouter = router({
         description: z.string().optional(),
         coverImage: z.string().optional(),
         totalCopies: z.number().min(1),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       const useCase = new CreateBookUseCase(bookRepository)
@@ -71,7 +68,7 @@ export const bookRouter = router({
         description: z.string().optional(),
         coverImage: z.string().optional(),
         totalCopies: z.number().min(1).optional(),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       const { id, ...data } = input

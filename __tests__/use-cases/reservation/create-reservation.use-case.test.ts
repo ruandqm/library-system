@@ -31,7 +31,10 @@ describe("CreateReservationUseCase", () => {
       search: vi.fn(),
     }
 
-    createReservationUseCase = new CreateReservationUseCase(mockReservationRepository, mockBookRepository)
+    createReservationUseCase = new CreateReservationUseCase(
+      mockReservationRepository,
+      mockBookRepository
+    )
   })
 
   it("should create a reservation successfully", async () => {
@@ -83,7 +86,9 @@ describe("CreateReservationUseCase", () => {
 
     vi.mocked(mockBookRepository.findById).mockResolvedValue(null)
 
-    await expect(createReservationUseCase.execute(reservationInput)).rejects.toThrow("Book not found")
+    await expect(createReservationUseCase.execute(reservationInput)).rejects.toThrow(
+      "Book not found"
+    )
 
     expect(mockBookRepository.findById).toHaveBeenCalledWith("nonexistent")
     expect(mockReservationRepository.create).not.toHaveBeenCalled()
@@ -123,7 +128,7 @@ describe("CreateReservationUseCase", () => {
     vi.mocked(mockReservationRepository.findByUserId).mockResolvedValue([existingReservation])
 
     await expect(createReservationUseCase.execute(reservationInput)).rejects.toThrow(
-      "You already have a pending reservation for this book",
+      "You already have a pending reservation for this book"
     )
 
     expect(mockBookRepository.findById).toHaveBeenCalledWith("book1")

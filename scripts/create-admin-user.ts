@@ -1,8 +1,16 @@
+import { config } from "dotenv"
+import { resolve } from "path"
 import { MongoClient } from "mongodb"
 import bcrypt from "bcryptjs"
 
+// Load environment variables from .env file
+config({ path: resolve(process.cwd(), ".env") })
+
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017"
 const MONGODB_DB = process.env.MONGODB_DB || "library"
+
+console.log("MONGODB_URI:", MONGODB_URI)
+console.log("MONGODB_DB:", MONGODB_DB)
 
 async function createLibrarianUser() {
   const client = new MongoClient(MONGODB_URI)
@@ -15,7 +23,9 @@ async function createLibrarianUser() {
     const usersCollection = db.collection("users")
 
     // Check if librarian already exists
-    const existingLibrarian = await usersCollection.findOne({ email: "librarian@library.com" })
+    const existingLibrarian = await usersCollection.findOne({
+      email: "librarian@library.com",
+    })
 
     if (existingLibrarian) {
       console.log("Librarian user already exists")

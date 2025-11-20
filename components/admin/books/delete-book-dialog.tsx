@@ -48,8 +48,8 @@ export function DeleteBookDialog({ book, open, onOpenChange }: DeleteBookDialogP
         <AlertDialogHeader>
           <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
           <AlertDialogDescription>
-            Isso excluirá permanentemente <span className="font-semibold">{book.title}</span> de {book.author}. Essa
-            ação não pode ser desfeita.
+            Isso excluirá permanentemente <span className="font-semibold">{book.title}</span> de{" "}
+            {book.author}. Essa ação não pode ser desfeita.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

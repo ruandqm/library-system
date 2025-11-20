@@ -7,4 +7,3 @@ export interface CategoryRepository {
   findAll(): Promise<Category[]>
   delete(id: string): Promise<void>
 }
-

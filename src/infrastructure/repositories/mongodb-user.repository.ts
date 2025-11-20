@@ -72,7 +72,9 @@ export class MongoDBUserRepository implements UserRepository {
       updatedAt: new Date(),
     }
 
-    await db.collection(this.collectionName).updateOne({ _id: new ObjectId(id) }, { $set: updateDoc })
+    await db
+      .collection(this.collectionName)
+      .updateOne({ _id: new ObjectId(id) }, { $set: updateDoc })
 
     const user = await this.findById(id)
     if (!user) throw new Error("User not found after update")

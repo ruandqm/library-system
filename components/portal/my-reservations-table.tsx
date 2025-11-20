@@ -1,7 +1,14 @@
 "use client"
 
 import { trpc } from "@/lib/trpc"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
@@ -68,7 +75,9 @@ export function MyReservationsTable() {
       <div className="flex flex-col items-center justify-center py-12">
         <BookmarkIcon className="size-12 text-muted-foreground" />
         <p className="mt-4 text-lg font-medium">Sem reservas</p>
-        <p className="text-sm text-muted-foreground">Reserve livros para garantir disponibilidade quando precisar</p>
+        <p className="text-sm text-muted-foreground">
+          Reserve livros para garantir disponibilidade quando precisar
+        </p>
       </div>
     )
   }

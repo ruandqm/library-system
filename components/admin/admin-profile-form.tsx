@@ -100,7 +100,11 @@ export function AdminProfileForm() {
 
         <div className="space-y-2">
           <Label htmlFor="address">Address</Label>
-          <Input id="address" {...register("address")} placeholder="123 Main St, City, State, ZIP" />
+          <Input
+            id="address"
+            {...register("address")}
+            placeholder="123 Main St, City, State, ZIP"
+          />
         </div>
       </div>
 

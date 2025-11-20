@@ -5,7 +5,7 @@ import type { Reservation, CreateReservationInput } from "@/domain/entities/rese
 export class CreateReservationUseCase {
   constructor(
     private reservationRepository: ReservationRepository,
-    private bookRepository: BookRepository,
+    private bookRepository: BookRepository
   ) {}
 
   async execute(input: CreateReservationInput): Promise<Reservation> {
@@ -17,7 +17,9 @@ export class CreateReservationUseCase {
 
     // Check if user already has a pending reservation for this book
     const userReservations = await this.reservationRepository.findByUserId(input.userId)
-    const existingReservation = userReservations.find((r) => r.bookId === input.bookId && r.status === "PENDING")
+    const existingReservation = userReservations.find(
+      (r) => r.bookId === input.bookId && r.status === "PENDING"
+    )
 
     if (existingReservation) {
       throw new Error("You already have a pending reservation for this book")

@@ -112,7 +112,9 @@ describe("CreateLoanUseCase", () => {
 
     vi.mocked(mockBookRepository.findById).mockResolvedValue(book)
 
-    await expect(createLoanUseCase.execute(loanInput)).rejects.toThrow("No copies available for loan")
+    await expect(createLoanUseCase.execute(loanInput)).rejects.toThrow(
+      "No copies available for loan"
+    )
 
     expect(mockBookRepository.findById).toHaveBeenCalledWith("book1")
     expect(mockLoanRepository.create).not.toHaveBeenCalled()

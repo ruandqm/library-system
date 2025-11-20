@@ -97,7 +97,7 @@ describe("Loan Workflow Integration Tests", () => {
         bookId: book.id,
         userId: "user2",
         dueDate: new Date("2024-12-31"),
-      }),
+      })
     ).rejects.toThrow("No copies available for loan")
 
     // Verify book status

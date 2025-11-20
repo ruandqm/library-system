@@ -105,7 +105,7 @@ export class MongoDBLoanRepository implements LoanRepository {
           status: "RETURNED",
           updatedAt: new Date(),
         },
-      },
+      }
     )
 
     const loan = await this.findById(id)

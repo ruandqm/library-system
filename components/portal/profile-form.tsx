@@ -80,7 +80,9 @@ export function ProfileForm() {
         <div className="space-y-2">
           <Label htmlFor="role">Função</Label>
           <Input id="role" value={user?.role} disabled className="bg-muted" />
-          <p className="text-xs text-muted-foreground">A função é atribuída pelos administradores</p>
+          <p className="text-xs text-muted-foreground">
+            A função é atribuída pelos administradores
+          </p>
         </div>
       </div>
 
@@ -100,7 +102,11 @@ export function ProfileForm() {
 
         <div className="space-y-2">
           <Label htmlFor="address">Endereço</Label>
-          <Input id="address" {...register("address")} placeholder="Rua Exemplo, 123, Cidade, Estado, CEP" />
+          <Input
+            id="address"
+            {...register("address")}
+            placeholder="Rua Exemplo, 123, Cidade, Estado, CEP"
+          />
         </div>
       </div>
 

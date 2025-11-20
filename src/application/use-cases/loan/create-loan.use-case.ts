@@ -5,7 +5,7 @@ import type { Loan, CreateLoanInput } from "@/domain/entities/loan.entity"
 export class CreateLoanUseCase {
   constructor(
     private loanRepository: LoanRepository,
-    private bookRepository: BookRepository,
+    private bookRepository: BookRepository
   ) {}
 
   async execute(input: CreateLoanInput): Promise<Loan> {

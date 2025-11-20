@@ -42,10 +42,7 @@ const isMember = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" })
   }
-  if (
-    ctx.session.user.role !== "MEMBER" &&
-    ctx.session.user.role !== "LIBRARIAN"
-  ) {
+  if (ctx.session.user.role !== "MEMBER" && ctx.session.user.role !== "LIBRARIAN") {
     throw new TRPCError({ code: "FORBIDDEN" })
   }
   return next({

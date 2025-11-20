@@ -23,7 +23,7 @@ export const loanRouter = router({
         bookId: z.string(),
         userId: z.string(),
         dueDate: z.date(),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       const useCase = new CreateLoanUseCase(loanRepository, bookRepository)

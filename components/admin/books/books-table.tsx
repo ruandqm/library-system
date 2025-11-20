@@ -2,7 +2,14 @@
 
 import { useState } from "react"
 import { trpc } from "@/lib/trpc"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,7 +31,7 @@ export function BooksTable() {
     (book) =>
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.isbn.includes(searchQuery),
+      book.isbn.includes(searchQuery)
   )
 
   const getStatusBadge = (status: string) => {
@@ -117,7 +124,9 @@ export function BooksTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center">
-                  {searchQuery ? "Nenhum livro encontrado para sua busca." : "Nenhum livro disponível. Adicione o primeiro livro!"}
+                  {searchQuery
+                    ? "Nenhum livro encontrado para sua busca."
+                    : "Nenhum livro disponível. Adicione o primeiro livro!"}
                 </TableCell>
               </TableRow>
             )}
@@ -127,8 +136,16 @@ export function BooksTable() {
 
       {selectedBook && (
         <>
-          <UpdateBookDialog book={selectedBook} open={isUpdateOpen} onOpenChange={setIsUpdateOpen} />
-          <DeleteBookDialog book={selectedBook} open={isDeleteOpen} onOpenChange={setIsDeleteOpen} />
+          <UpdateBookDialog
+            book={selectedBook}
+            open={isUpdateOpen}
+            onOpenChange={setIsUpdateOpen}
+          />
+          <DeleteBookDialog
+            book={selectedBook}
+            open={isDeleteOpen}
+            onOpenChange={setIsDeleteOpen}
+          />
         </>
       )}
     </div>
