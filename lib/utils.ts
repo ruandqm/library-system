@@ -20,3 +20,11 @@ export function formatPhone(value: string) {
   }
 }
 
+export function translateRole(role: string): string {
+  const roleMap: Record<string, string> = {
+    MEMBER: "Membro",
+    LIBRARIAN: "Bibliotecário",
+  }
+  return roleMap[role] || role
+}
+

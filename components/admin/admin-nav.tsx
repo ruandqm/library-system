@@ -13,7 +13,7 @@ import {
   UserIcon,
   TagIcon,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, translateRole } from "@/lib/utils"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -77,7 +77,7 @@ export function AdminNav({ user }: AdminNavProps) {
               <Button variant="ghost" className="flex items-center gap-2">
                 <div className="hidden text-right text-sm sm:block">
                   <p className="font-medium line-clamp-1">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">{user.role}</p>
+                  <p className="text-xs text-muted-foreground">{translateRole(user.role)}</p>
                 </div>
                 <UserIcon className="size-4" />
               </Button>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { trpc } from "@/lib/trpc"
 import {
@@ -29,6 +29,9 @@ import type { CreateBookInput } from "@/domain/entities/book.entity"
 
 export function CreateBookDialog() {
   const [open, setOpen] = useState(false)
+  const [imageUrl, setImageUrl] = useState<string>("")
+  const [imageValid, setImageValid] = useState<boolean | null>(null)
+  const [isValidatingImage, setIsValidatingImage] = useState(false)
   const { toast } = useToast()
   const utils = trpc.useUtils()
   const { data: categories } = trpc.category.getAll.useQuery()
@@ -43,6 +46,50 @@ export function CreateBookDialog() {
   } = useForm<CreateBookInput>()
 
   const categoryId = watch("categoryId")
+  const coverImage = watch("coverImage")
+
+  // Validar URL da imagem quando o campo mudar
+  useEffect(() => {
+    const validateImageUrl = async () => {
+      if (!coverImage || coverImage.trim() === "") {
+        setImageValid(null)
+        setImageUrl("")
+        return
+      }
+
+      const url = coverImage.trim()
+      setImageUrl(url)
+
+      // Verificar se é uma URL válida
+      try {
+        new URL(url)
+      } catch {
+        setImageValid(false)
+        setIsValidatingImage(false)
+        return
+      }
+
+      setIsValidatingImage(true)
+
+      // Tentar carregar a imagem para validar se a URL é válida
+      const img = new Image()
+      img.onload = () => {
+        setImageValid(true)
+        setIsValidatingImage(false)
+      }
+      img.onerror = () => {
+        setImageValid(false)
+        setIsValidatingImage(false)
+      }
+      img.src = url
+    }
+
+    const timeoutId = setTimeout(() => {
+      validateImageUrl()
+    }, 500) // Debounce de 500ms
+
+    return () => clearTimeout(timeoutId)
+  }, [coverImage])
 
   const createBook = trpc.book.create.useMutation({
     onSuccess: () => {
@@ -53,6 +100,8 @@ export function CreateBookDialog() {
       utils.book.getAll.invalidate()
       setOpen(false)
       reset()
+      setImageUrl("")
+      setImageValid(null)
     },
     onError: (error) => {
       const code = (error as any)?.data?.code as string | undefined
@@ -78,8 +127,18 @@ export function CreateBookDialog() {
     })
   }
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
+    if (!newOpen) {
+      // Resetar estados quando o dialog fechar
+      setImageUrl("")
+      setImageValid(null)
+      setIsValidatingImage(false)
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <PlusIcon />
@@ -176,6 +235,29 @@ export function CreateBookDialog() {
               {...register("coverImage")}
               placeholder="https://..."
             />
+            {isValidatingImage && (
+              <p className="text-sm text-muted-foreground">Validando URL...</p>
+            )}
+            {imageValid === false && imageUrl && !isValidatingImage && (
+              <p className="text-sm text-destructive">
+                URL inválida ou imagem não encontrada. Verifique se a URL está correta.
+              </p>
+            )}
+            {imageValid === true && imageUrl && (
+              <div className="mt-2 space-y-2">
+                <p className="text-sm text-green-600 dark:text-green-400">✓ URL válida</p>
+                <div className="relative aspect-[3/4] w-full max-w-[200px] overflow-hidden rounded-md border">
+                  <img
+                    src={imageUrl}
+                    alt="Preview da capa"
+                    className="h-full w-full object-cover"
+                    onError={() => {
+                      setImageValid(false)
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <DialogFooter>

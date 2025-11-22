@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { BookOpenIcon, BookMarkedIcon, UserIcon, LogOutIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, translateRole } from "@/lib/utils"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,7 +64,7 @@ export function PortalNav({ user }: PortalNavProps) {
               <Button variant="ghost" className="flex items-center gap-2">
                 <div className="hidden text-right text-sm sm:block">
                   <p className="font-medium line-clamp-1">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">{user.role}</p>
+                  <p className="text-xs text-muted-foreground">{translateRole(user.role)}</p>
                 </div>
                 <UserIcon className="size-4" />
               </Button>

@@ -8,6 +8,7 @@ config({ path: resolve(process.cwd(), ".env") })
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017"
 const MONGODB_DB = process.env.MONGODB_DB || "library"
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
 console.log("MONGODB_URI:", MONGODB_URI)
 console.log("MONGODB_DB:", MONGODB_DB)
@@ -24,7 +25,7 @@ async function createLibrarianUser() {
 
     // Check if librarian already exists
     const existingLibrarian = await usersCollection.findOne({
-      email: "librarian@library.com",
+      email: "admin@admin.com",
     })
 
     if (existingLibrarian) {
@@ -32,13 +33,18 @@ async function createLibrarianUser() {
       return
     }
 
+    if (!ADMIN_PASSWORD) {
+      console.error("ADMIN_PASSWORD is not set")
+      return
+    }
+
     // Create librarian user (acts as administrator)
-    const hashedPassword = await bcrypt.hash("librarian123", 10)
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10)
     const now = new Date()
 
     await usersCollection.insertOne({
       name: "Librarian User",
-      email: "librarian@library.com",
+      email: "admin@admin.com",
       password: hashedPassword,
       role: "LIBRARIAN",
       createdAt: now,
@@ -46,7 +52,7 @@ async function createLibrarianUser() {
     })
 
     console.log("Librarian user created successfully")
-    console.log("Email: librarian@library.com")
+    console.log("Email: admin@admin.com")
     console.log("Password: librarian123")
   } catch (error) {
     console.error("Error creating librarian user:", error)

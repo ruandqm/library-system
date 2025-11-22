@@ -13,7 +13,6 @@
     "test:ui": "vitest --ui",
     "test:unit": "vitest __tests__/use-cases",
     "db:create-admin": "tsx scripts/create-admin-user.ts",
-    "db:create-samples": "tsx scripts/create-sample-users.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
