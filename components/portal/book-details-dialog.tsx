@@ -15,6 +15,7 @@ import { BookmarkIcon } from "lucide-react"
 import type { Book } from "@/domain/entities/book.entity"
 import { trpc } from "@/lib/trpc"
 import { useToast } from "@/hooks/use-toast"
+import { translateBookStatus } from "@/lib/utils"
 
 interface BookDetailsDialogProps {
   book: Book
@@ -91,7 +92,7 @@ export function BookDetailsDialog({ book, open, onOpenChange }: BookDetailsDialo
             </div>
             <div>
               <p className="text-sm font-medium">Status</p>
-              <p className="text-sm text-muted-foreground">{book.status}</p>
+              <p className="text-sm text-muted-foreground">{translateBookStatus(book.status)}</p>
             </div>
           </div>
 

@@ -14,16 +14,19 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { PlusIcon } from "lucide-react"
+import { PlusIcon, CheckIcon, ChevronsUpDownIcon } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { cn } from "@/lib/utils"
 
 interface CreateLoanForm {
   bookId: string
@@ -33,6 +36,8 @@ interface CreateLoanForm {
 
 export function CreateLoanDialog() {
   const [open, setOpen] = useState(false)
+  const [bookOpen, setBookOpen] = useState(false)
+  const [userOpen, setUserOpen] = useState(false)
   const { toast } = useToast()
   const utils = trpc.useUtils()
 
@@ -48,6 +53,9 @@ export function CreateLoanDialog() {
     formState: { errors },
   } = useForm<CreateLoanForm>()
 
+  const bookId = watch("bookId")
+  const userId = watch("userId")
+
   const createLoan = trpc.loan.create.useMutation({
     onSuccess: () => {
       toast({
@@ -58,6 +66,8 @@ export function CreateLoanDialog() {
       utils.book.getAll.invalidate()
       setOpen(false)
       reset()
+      setBookOpen(false)
+      setUserOpen(false)
     },
     onError: (error) => {
       toast({
@@ -69,6 +79,14 @@ export function CreateLoanDialog() {
   })
 
   const onSubmit = (data: CreateLoanForm) => {
+    if (!data.bookId || !data.userId) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione um livro e um membro",
+        variant: "destructive",
+      })
+      return
+    }
     createLoan.mutate({
       bookId: data.bookId,
       userId: data.userId,
@@ -76,54 +94,144 @@ export function CreateLoanDialog() {
     })
   }
 
-  const availableBooks = books?.filter((book) => book.availableCopies > 0)
+  const availableBooks = books?.filter((book) => book.availableCopies > 0) || []
+  const members = users?.filter((user) => user.role === "MEMBER") || []
+
+  const selectedBook = availableBooks.find((book) => book.id === bookId)
+  const selectedUser = members.find((user) => user.id === userId)
+
+  const handleDialogOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
+    if (!newOpen) {
+      setBookOpen(false)
+      setUserOpen(false)
+    }
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <PlusIcon />
           Criar Empréstimo
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-lg overflow-hidden">
         <DialogHeader>
           <DialogTitle>Criar Novo Empréstimo</DialogTitle>
           <DialogDescription>Emitir um livro para um membro da biblioteca</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 overflow-hidden">
           <div className="space-y-2">
             <Label htmlFor="bookId">Livro *</Label>
-            <Select onValueChange={(value) => setValue("bookId", value)} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um livro" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableBooks?.map((book) => (
-                  <SelectItem key={book.id} value={book.id}>
-                    {book.title} - {book.author} ({book.availableCopies} disponível(is))
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={bookOpen} onOpenChange={setBookOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={bookOpen}
+                  className="w-full justify-between min-w-0 overflow-hidden whitespace-normal [&>span]:truncate"
+                  type="button"
+                >
+                  <span className="text-left flex-1 min-w-0 mr-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                    {selectedBook
+                      ? `${selectedBook.title} - ${selectedBook.author} (${selectedBook.availableCopies} disponível(is))`
+                      : "Selecione um livro..."}
+                  </span>
+                  <ChevronsUpDownIcon className="h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Pesquisar livro..." />
+                  <CommandList>
+                    <CommandEmpty>Nenhum livro encontrado.</CommandEmpty>
+                    <CommandGroup>
+                      {availableBooks.map((book) => (
+                        <CommandItem
+                          key={book.id}
+                          value={`${book.title} ${book.author} ${book.isbn}`}
+                          onSelect={() => {
+                            setValue("bookId", book.id, { shouldValidate: true })
+                            setBookOpen(false)
+                          }}
+                        >
+                          <CheckIcon
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              bookId === book.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {book.title} - {book.author}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {book.availableCopies} disponível(is)
+                            </span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {errors.bookId && <p className="text-sm text-destructive">{errors.bookId.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="userId">Membro *</Label>
-            <Select onValueChange={(value) => setValue("userId", value)} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um membro" />
-              </SelectTrigger>
-              <SelectContent>
-                {users
-                  ?.filter((user) => user.role === "MEMBER")
-                  .map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.name} - {user.email}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+            <Popover open={userOpen} onOpenChange={setUserOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={userOpen}
+                  className="w-full justify-between min-w-0 overflow-hidden whitespace-normal [&>span]:truncate"
+                  type="button"
+                >
+                  <span className="text-left flex-1 min-w-0 mr-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                    {selectedUser
+                      ? `${selectedUser.name} - ${selectedUser.email}`
+                      : "Selecione um membro..."}
+                  </span>
+                  <ChevronsUpDownIcon className="h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Pesquisar membro..." />
+                  <CommandList>
+                    <CommandEmpty>Nenhum membro encontrado.</CommandEmpty>
+                    <CommandGroup>
+                      {members.map((user) => (
+                        <CommandItem
+                          key={user.id}
+                          value={`${user.name} ${user.email}`}
+                          onSelect={() => {
+                            setValue("userId", user.id, { shouldValidate: true })
+                            setUserOpen(false)
+                          }}
+                        >
+                          <CheckIcon
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              userId === user.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">{user.name}</span>
+                            <span className="text-xs text-muted-foreground">{user.email}</span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {errors.userId && <p className="text-sm text-destructive">{errors.userId.message}</p>}
           </div>
 
           <div className="space-y-2">

@@ -28,3 +28,11 @@ export function translateRole(role: string): string {
   return roleMap[role] || role
 }
 
+export function translateBookStatus(status: string): string {
+  const statusMap: Record<string, string> = {
+    AVAILABLE: "Disponível",
+    BORROWED: "Emprestado",
+    RESERVED: "Reservado",
+  }
+  return statusMap[status] || status
+}
