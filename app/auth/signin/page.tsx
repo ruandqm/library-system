@@ -6,7 +6,7 @@ export default function SignInPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Sistema de Gestão de Biblioteca</CardTitle>
+          <CardTitle>Sistema de Biblioteca</CardTitle>
           <CardDescription>Entre para acessar sua conta</CardDescription>
         </CardHeader>
         <CardContent>

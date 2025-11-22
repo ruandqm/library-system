@@ -6,7 +6,7 @@ export default function SignUpPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Sistema de Gestão de Biblioteca</CardTitle>
+          <CardTitle>Sistema de Biblioteca</CardTitle>
           <CardDescription>Crie sua conta para começar</CardDescription>
         </CardHeader>
         <CardContent>
